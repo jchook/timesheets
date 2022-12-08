@@ -1,0 +1,27 @@
+#!/usr/bin/env php8.1
+<?php
+
+use Jchook\Timesheets\Textual\Parser;
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+$opt = getopt('', [], $restIndex) ?: [];
+$files = array_slice($argv, $restIndex);
+
+$html = ['<!DOCTYPE html>','<html>', '<head></head>', '<body>'];
+$parser = new Parser();
+foreach ($files as $file) {
+  $timesheet = $parser->parseTimesheetFile($file);
+  $hoursSum = array_sum(array_map(fn ($e) => $e->hours, $timesheet->entries));
+  $html[] = '<h1>' . $timesheet->date->format('Y-m-d') . ': <small>' . $hoursSum . 'h</small></h1>';
+  foreach ($timesheet->entries as $entry) {
+    $html[] = "<h2>{$entry->projectName}</h2>";
+    $html[] = "<pre>{$entry->description}</pre>";
+    $html[] = "<p>{$entry->hours}h</p>";
+  }
+  $html[] = '<hr />';
+}
+$html[] = '</body>';
+$html[] = '</html>';
+
+echo implode("\n", $html);

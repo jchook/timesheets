@@ -8,9 +8,18 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $opt = getopt('', [], $restIndex) ?: [];
 $files = array_slice($argv, $restIndex);
 
-$html = ['<!DOCTYPE html>','<html>', '<head></head>', '<body>'];
+echo <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Timesheets</title>
+</head>
+<body>
+HTML;
+
 $parser = new Parser();
 foreach ($files as $file) {
+  $html = [];
   $timesheet = $parser->parseTimesheetFile($file);
   $hoursSum = array_sum(array_map(fn ($e) => $e->hours, $timesheet->entries));
   $html[] = '<h1>' . $timesheet->date->format('Y-m-d') . ': <small>' . $hoursSum . 'h</small></h1>';
@@ -19,9 +28,8 @@ foreach ($files as $file) {
     $html[] = "<pre>{$entry->description}</pre>";
     $html[] = "<p>{$entry->hours}h</p>";
   }
-  $html[] = '<hr />';
+  echo implode("\n", $html);
+  echo "<hr>\n";
 }
-$html[] = '</body>';
-$html[] = '</html>';
-
-echo implode("\n", $html);
+echo "</body>\n";
+echo "</html>\n";

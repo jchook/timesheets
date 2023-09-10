@@ -4,6 +4,9 @@ namespace Jchook\Timesheets\Ast;
 
 use DateTimeInterface;
 
+/**
+ * Represents a timesheet for a single day
+ */
 class Timesheet
 {
   /**

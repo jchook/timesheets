@@ -2,6 +2,9 @@
 
 namespace Jchook\Timesheets\Ast;
 
+/**
+ * Represents one time entry for a timesheet
+ */
 class Entry
 {
   public function __construct(

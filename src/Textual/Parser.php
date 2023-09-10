@@ -8,22 +8,32 @@ use Jchook\Timesheets\Ast\Entry;
 use Jchook\Timesheets\Ast\Timesheet;
 use RuntimeException;
 
+/**
+ * Regex-based parser for timesheet files
+ */
 class Parser
 {
-  const DEFAULT_HOURS_PATTERN_FAIL_1 = '@' .
-      '^#\s+([A-Za-z0-9\-_ ]+)\n+' .
-      '((?:^-.+\n+)+)' .
-      '^([0-9.]+)h\s*\n' .
-      '@';
+  const DEFAULT_HOURS_PATTERN = '@' .
 
-  const DEFAULT_HOURS_PATTERN = '@^#\s+([A-Za-z0-9\-_ ]+)\n+((?:^-.+\n+)+)([0-9.]+)h\s*\n@mi';
+    // # Project Name
+    '^#\s+([A-Za-z0-9\-_ ]+)\n+' .
+
+    // - List of billable activity
+    '((?:^-.+\n+)+)' .
+
+    // 1h (duration in hours)
+    '([0-9.]+)h\s*\n' .
+
+    // Multiline and case-insensitive
+    '@mi'
+  ;
 
   public function __construct(
     public string $hoursPattern = self::DEFAULT_HOURS_PATTERN,
   )
   {}
 
-  function parseTimesheetFile(string $path): Timesheet
+  public function parseTimesheetFile(string $path): Timesheet
   {
     $dateStr = pathinfo($path, PATHINFO_FILENAME);
     $date = new DateTimeImmutable($dateStr);
@@ -31,7 +41,7 @@ class Parser
     return $this->parseTimesheet($date, $doc);
   }
 
-  function parseTimesheet(DateTimeInterface $date, string $doc): Timesheet
+  public function parseTimesheet(DateTimeInterface $date, string $doc): Timesheet
   {
     error_clear_last();
     $matched = preg_match_all($this->hoursPattern, $doc, $matches, PREG_SET_ORDER);
